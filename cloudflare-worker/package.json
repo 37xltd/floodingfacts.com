@@ -1,0 +1,27 @@
+{
+  "name": "37x-next-sites-platform",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check": "wrangler deploy --dry-run --config wrangler.jsonc",
+    "deploy:tide": "wrangler deploy --env tide --config wrangler.jsonc",
+    "deploy:asic": "wrangler deploy --env asic --config wrangler.jsonc",
+    "deploy:charity": "wrangler deploy --env charity --config wrangler.jsonc",
+    "deploy:rates": "wrangler deploy --env rates --config wrangler.jsonc",
+    "deploy:snow": "wrangler deploy --env snow --config wrangler.jsonc",
+    "deploy:energy": "wrangler deploy --env energy --config wrangler.jsonc",
+    "deploy:river": "wrangler deploy --env river --config wrangler.jsonc",
+    "deploy:roads": "wrangler deploy --env roads --config wrangler.jsonc",
+    "deploy:tender": "wrangler deploy --env tender --config wrangler.jsonc",
+    "deploy:ukmoney": "wrangler deploy --env ukmoney --config wrangler.jsonc",
+    "deploy:climatecontext": "wrangler deploy --env climatecontext --config wrangler.jsonc",
+    "deploy:heritage": "wrangler deploy --env heritage --config wrangler.jsonc",
+    "deploy:boat": "wrangler deploy --env boat --config wrangler.jsonc",
+    "deploy:fcc": "wrangler deploy --env fcc --config wrangler.jsonc",
+    "deploy:vehicleimport": "wrangler deploy --env vehicleimport --config wrangler.jsonc"
+  },
+  "devDependencies": {
+    "wrangler": "^4.127.1"
+  }
+}

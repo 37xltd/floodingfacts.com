@@ -1,0 +1,187 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "37x-evidence-site",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-15",
+  "observability": { "enabled": true },
+  "env": {
+    "tide": {
+      "name": "us-tide-marine-conditions",
+      "vars": { "SITE_KEY": "tide" },
+      "routes": [{ "pattern": "tide99.com", "custom_domain": true }],
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "asic": {
+      "name": "australian-company-register",
+      "vars": { "SITE_KEY": "asic" },
+      "routes": [
+        {
+          "pattern": "australiancompanydata.com/*",
+          "zone_name": "australiancompanydata.com",
+        },
+        {
+          "pattern": "www.australiancompanydata.com/*",
+          "zone_name": "australiancompanydata.com",
+        },
+      ],
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "charity": {
+      "name": "uk-charity-register-lookup",
+      "vars": { "SITE_KEY": "charity" },
+      "routes": [{ "pattern": "charitysignal.co.uk", "custom_domain": true }],
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "boat": {
+      "name": "boat-safety-check",
+      "vars": { "SITE_KEY": "boat" },
+      "routes": [{ "pattern": "boatrecallcheck.com", "custom_domain": true }],
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "fcc": {
+      "name": "fcc-equipment-id-lookup",
+      "vars": { "SITE_KEY": "fcc" },
+      "routes": [{ "pattern": "fccidcheck.com", "custom_domain": true }],
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "vehicleimport": {
+      "name": "vehicle-import-eligibility",
+      "vars": { "SITE_KEY": "vehicleimport" },
+      "routes": [
+        { "pattern": "vehicleimportfacts.com", "custom_domain": true },
+      ],
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "rates": {
+      "name": "uk-interest-housing-costs",
+      "vars": { "SITE_KEY": "rates" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "snow": {
+      "name": "swiss-avalanche-snow-conditions",
+      "vars": { "SITE_KEY": "snow" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "energy": {
+      "name": "energy-label-decoder",
+      "vars": { "SITE_KEY": "energy" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "river": {
+      "name": "uk-river-levels-flood-watch",
+      "vars": { "SITE_KEY": "river" },
+      "routes": [
+        { "pattern": "floodingfacts.com/*", "zone_name": "floodingfacts.com" },
+        {
+          "pattern": "www.floodingfacts.com/*",
+          "zone_name": "floodingfacts.com",
+        },
+      ],
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "roads": {
+      "name": "uk-road-collision-hotspots",
+      "vars": { "SITE_KEY": "roads" },
+      "routes": [
+        {
+          "pattern": "placechecker.co.uk/*",
+          "zone_name": "placechecker.co.uk",
+        },
+        {
+          "pattern": "www.placechecker.co.uk/*",
+          "zone_name": "placechecker.co.uk",
+        },
+      ],
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "heritage": {
+      "name": "uk-heritage-atlas",
+      "vars": { "SITE_KEY": "heritage" },
+      "routes": [
+        { "pattern": "listedbuildingfacts.com/*", "zone_name": "listedbuildingfacts.com" },
+        { "pattern": "www.listedbuildingfacts.com/*", "zone_name": "listedbuildingfacts.com" }
+      ],
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "cosmetics": {
+      "name": "uk-cosmetics-ingredient-decoder",
+      "vars": { "SITE_KEY": "cosmetics" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "facilities": {
+      "name": "us-public-facilities-directory",
+      "vars": { "SITE_KEY": "facilities" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "wildlife": {
+      "name": "nearby-wildlife-finder",
+      "vars": { "SITE_KEY": "wildlife" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "prop65": {
+      "name": "california-prop65-decoder",
+      "vars": { "SITE_KEY": "prop65" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "cycling": {
+      "name": "urban-cycling-bike-share",
+      "vars": { "SITE_KEY": "cycling" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "grocery": {
+      "name": "everyday-grocery-price-tracker",
+      "vars": { "SITE_KEY": "grocery" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "books": {
+      "name": "open-shelf-classics",
+      "vars": { "SITE_KEY": "books" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "repair": {
+      "name": "product-repairability-module",
+      "vars": { "SITE_KEY": "repair" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "car": {
+      "name": "car-reliability-mot-module",
+      "vars": { "SITE_KEY": "car" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "beach": {
+      "name": "beach-bathing-water-safety",
+      "vars": { "SITE_KEY": "beach" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "ev": {
+      "name": "ev-adoption-registration-tracker",
+      "vars": { "SITE_KEY": "ev" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "tender": {
+      "name": "tendertendertender-data",
+      "vars": { "SITE_KEY": "tender" },
+      "routes": [
+        {
+          "pattern": "tendertendertender.com/*",
+          "zone_name": "tendertendertender.com",
+        },
+        {
+          "pattern": "www.tendertendertender.com/*",
+          "zone_name": "tendertendertender.com",
+        },
+      ],
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "ukmoney": {
+      "name": "uk-public-money-procurement",
+      "vars": { "SITE_KEY": "ukmoney" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+    "climatecontext": {
+      "name": "climate99-context",
+      "vars": { "SITE_KEY": "climatecontext" },
+      "r2_buckets": [{ "binding": "PUBLIC_DATA", "bucket_name": "atlas-raw" }],
+    },
+  },
+}
