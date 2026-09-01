@@ -176,6 +176,9 @@ test("FloodingFacts turns raw station fields into a user-first dashboard", () =>
     },
     "https://floodingfacts.com",
     "1771TH",
+    [
+      { id: "1772TH", name: "Lower Letcombe", river: "Letcombe Brook", town: "Letcombe Regis", lat: 51.58, long: -1.44 },
+    ],
   );
   assert.match(html, /Letcombe Regis river level and station reading/);
   assert.match(html, /Latest published reading/);
@@ -191,6 +194,9 @@ test("FloodingFacts turns raw station fields into a user-first dashboard", () =>
   assert.match(html, /choose “Save as PDF”/);
   assert.match(html, /@page\{size:A4/);
   assert.match(html, /Evidence report · prepared/);
+  assert.match(html, /More monitoring on Letcombe Brook/);
+  assert.match(html, /Lower Letcombe/);
+  assert.match(html, /All stations on Letcombe Brook/);
   assert.doesNotMatch(html, />LiveReadingRetrievedAt</);
   assert.ok(
     html.indexOf("Technical record and provenance") <
@@ -354,12 +360,18 @@ test("Tide turns predictions and observations into a planning dashboard", () => 
     },
     "https://tide99.com",
     "8518750",
+    [
+      { stationId: "8510560", name: "Montauk", state: "NY", lat: 41.05, long: -71.96 },
+    ],
   );
   assert.match(html, /The Battery tide times and water levels/);
   assert.match(html, /Latest stored observation/);
   assert.match(html, /Next published high and low tides/);
   assert.match(html, /Open NOAA station/);
   assert.match(html, /For navigation or safety/);
+  assert.match(html, /Nearby tide stations/);
+  assert.match(html, /Montauk/);
+  assert.match(html, /All stations in NY/);
   assert.match(html, /Download report \(PDF\)/);
 });
 

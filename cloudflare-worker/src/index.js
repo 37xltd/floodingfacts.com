@@ -219,6 +219,53 @@ const routeRecords = (records, field, value) =>
   records.filter(
     (record) => String(record?.[field] ?? "").trim() === String(value).trim(),
   );
+const recordPoint = (record) => {
+  const lat = Number(record?.lat ?? record?.latitude);
+  const lon = Number(record?.long ?? record?.lon ?? record?.longitude);
+  return Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
+};
+const straightLineKm = (left, right) => {
+  if (!left || !right) return null;
+  const radians = (value) => (value * Math.PI) / 180;
+  const dLat = radians(right.lat - left.lat);
+  const dLon = radians(right.lon - left.lon);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(radians(left.lat)) * Math.cos(radians(right.lat)) * Math.sin(dLon / 2) ** 2;
+  return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+function relatedEntitySection(site, entity, id, records = []) {
+  const current = recordPoint(entity);
+  const tide = site.projection.includes("tide-marine");
+  const flood = site.projection.includes("floodingfacts");
+  const river = entity.riverName || entity.river;
+  const groupValue = tide ? entity.state : flood ? river : entity.state || entity.admin_area || entity.country;
+  const ranked = records
+    .filter((record) => String(entityId(record)) !== String(id))
+    .map((record) => ({ ...record, distance: straightLineKm(current, recordPoint(record)) }))
+    .filter((record) => {
+      if (tide) return groupValue && record.state === groupValue;
+      if (flood) return (river && record.river === river) || (entity.catchmentName && record.catchment === entity.catchmentName);
+      return groupValue && [record.state, record.admin_area, record.country].includes(groupValue);
+    })
+    .sort((a, b) => (a.distance ?? Number.MAX_VALUE) - (b.distance ?? Number.MAX_VALUE))
+    .slice(0, 6);
+  if (!ranked.length) return "";
+  const cards = ranked.map((record) => {
+    const recordId = entityId(record);
+    const name = record.name || record.label || record.charity_name || record.company_name || record.title || recordId;
+    const context = tide
+      ? `${record.state || "US coast"}${record.distance != null ? ` · ${record.distance.toLocaleString("en-GB", { maximumFractionDigits: 0 })} km away` : ""}`
+      : flood
+        ? [record.river, record.town, record.distance != null ? `${record.distance.toLocaleString("en-GB", { maximumFractionDigits: 0 })} km away` : null].filter(Boolean).join(" · ")
+        : [record.admin_area, record.state, record.country].filter(Boolean).join(" · ");
+    return `<a class="card" href="/entity/${routeValue(recordId)}" style="text-decoration:none;min-height:0"><small>${esc(context || `Related ${site.entity} record`)}</small><h2 style="font-size:1.35rem">${esc(name)}</h2><p>Open the source-linked record →</p></a>`;
+  }).join("");
+  const groupLink = tide && groupValue
+    ? `<a href="/state/${routeValue(groupValue)}">All stations in ${esc(groupValue)} →</a>`
+    : flood && river
+      ? `<a href="/river/${routeValue(river)}">All stations on ${esc(river)} →</a>`
+      : "";
+  return `<section class="related-records" aria-labelledby="related-records-heading"><div class="section-heading"><div><p class="eyebrow">Keep exploring</p><h2 id="related-records-heading">${tide ? "Nearby tide stations" : flood ? `More monitoring on ${esc(river || "this watercourse")}` : `Similar ${esc(site.entity)} records`}</h2><p>These are linked by published geography or classification—not editorial ranking.</p></div>${groupLink}</div><div class="grid">${cards}</div>${current ? `<p class="fine-print">Distances are straight-line measurements between published station coordinates, not travel distances.</p>` : ""}</section>`;
+}
 function sitemapXml(origin, records = [], extraPaths = []) {
   const paths = ["/", "/about", "/sources", "/corrections", ...extraPaths];
   for (const record of records) {
@@ -556,7 +603,7 @@ function evidenceChart(entity) {
     .join(" ");
   return `<section class="chart-panel" aria-labelledby="chart-heading"><div><p class="eyebrow">Visual evidence</p><h2 id="chart-heading">${esc(heading)}</h2><p>The chart visualises the values listed in the table below; it does not interpolate missing records.</p></div><svg viewBox="0 0 600 205" role="img" aria-label="${esc(heading)}, ranging from ${min} to ${max}"><line x1="20" y1="170" x2="580" y2="170"></line><polyline points="${coords}"></polyline>${points.map((row, index) => `<circle cx="${((index / (points.length - 1)) * 560 + 20).toFixed(1)}" cy="${(170 - ((row.value - min) / range) * 130).toFixed(1)}" r="4"><title>${esc(row.label)}: ${esc(row.value)}</title></circle>`).join("")}<text x="20" y="198">${esc(points[0].label)}</text><text x="580" y="198" text-anchor="end">${esc(points.at(-1).label)}</text></svg></section>`;
 }
-function floodEntityPage(site, entity, origin, id) {
+function floodEntityPage(site, entity, origin, id, related = "") {
   const reading = entity.measures?.[0];
   const measure = String(reading?.measure_id || "");
   const unit = measure.includes("mASD")
@@ -610,7 +657,7 @@ function floodEntityPage(site, entity, origin, id) {
     <div class="actions"><a class="button" href="${warningUrl}" rel="external">Check official flood warnings ↗</a>${mapUrl ? `<a class="button secondary" href="${mapUrl}" rel="external">View station map ↗</a>` : ""}<a class="button secondary" href="/search?q=${encodeURIComponent(entity.town || place)}">Find another station</a></div>
     <section class="evidence-grid" aria-label="Station summary"><article class="evidence-card"><small>River</small><strong>${esc(river)}</strong><span>Watercourse named by the publisher</span></article><article class="evidence-card"><small>Catchment</small><strong>${esc(entity.catchmentName || "Unavailable")}</strong><span>Environment Agency catchment context</span></article><article class="evidence-card"><small>Station ID</small><strong>${esc(entity.stationReference || id)}</strong><span>Use this when checking the official source</span></article></section>
     ${locatorMap(entity, place)}
-    <section class="explain"><article class="panel"><h2>What this reading tells you</h2><p>It is the latest value published for this monitoring instrument at the stated observation time. The unit <strong>${esc(unit)}</strong> is retained from the Environment Agency measure record.</p><p>This page does not currently have an approved typical range or warning threshold for this measure, so it does not label the reading as high, normal or low.</p></article><article class="panel warning"><h2>Need a current safety answer?</h2><p>A gauge reading is not a flood warning or a property-risk assessment. Use the official warning service for current alerts and follow emergency-service advice.</p><p><a href="${warningUrl}" rel="external"><strong>Open the official flood-warning check →</strong></a></p></article></section>
+    <section class="explain"><article class="panel"><h2>What this reading tells you</h2><p>It is the latest value published for this monitoring instrument at the stated observation time. The unit <strong>${esc(unit)}</strong> is retained from the Environment Agency measure record.</p><p>This page does not currently have an approved typical range or warning threshold for this measure, so it does not label the reading as high, normal or low.</p></article><article class="panel warning"><h2>Need a current safety answer?</h2><p>A gauge reading is not a flood warning or a property-risk assessment. Use the official warning service for current alerts and follow emergency-service advice.</p><p><a href="${warningUrl}" rel="external"><strong>Open the official flood-warning check →</strong></a></p></article></section>${related}
     <details class="technical"><summary>Technical record and provenance</summary><div class="technical-grid">${technical}</div><p><a href="/sources">Source, licence and methodology</a></p></details>`,
     {
       title: `${place} river level and station reading | FloodingFacts`,
@@ -620,7 +667,7 @@ function floodEntityPage(site, entity, origin, id) {
     },
   );
 }
-function tideEntityPage(site, entity, origin, id) {
+function tideEntityPage(site, entity, origin, id, related = "") {
   const title = entity.name || id;
   const predictions = [...(entity.predictions || [])].sort((a, b) =>
     String(a.prediction_time).localeCompare(String(b.prediction_time)),
@@ -648,7 +695,7 @@ function tideEntityPage(site, entity, origin, id) {
   <section class="evidence-grid"><article class="evidence-card"><small>Datum</small><strong>${esc(datum)}</strong><span>The vertical reference for the published height</span></article><article class="evidence-card"><small>Time basis</small><strong>${esc(zone)}</strong><span>Retained from the NOAA response</span></article><article class="evidence-card"><small>Coverage</small><strong>${predictions.length} predictions</strong><span>${observations.length} recent observations stored</span></article></section>
   ${locatorMap(entity, title)}${evidenceChart(entity)}
   <section id="next-tides"><p class="eyebrow">Plan the next water window</p><h2>Next published high and low tides</h2>${rows ? `<table><thead><tr><th>Published time</th><th>Event</th><th>Height</th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="notice">No prediction series is available for this station.</div>`}</section>
-  <section class="explain"><article class="panel"><h2>How to read this page</h2><p>Predicted heights are astronomical estimates relative to <strong>${esc(datum)}</strong>. Weather, pressure, wind and river flow can move observed water away from the prediction.</p></article><article class="panel warning"><h2>For navigation or safety</h2><p>This is a planning aid, not a navigational chart or warning service. Check NOAA notices, local conditions and official marine guidance before acting.</p></article></section>
+  <section class="explain"><article class="panel"><h2>How to read this page</h2><p>Predicted heights are astronomical estimates relative to <strong>${esc(datum)}</strong>. Weather, pressure, wind and river flow can move observed water away from the prediction.</p></article><article class="panel warning"><h2>For navigation or safety</h2><p>This is a planning aid, not a navigational chart or warning service. Check NOAA notices, local conditions and official marine guidance before acting.</p></article></section>${related}
   <details class="technical"><summary>Source, identifiers and limitations</summary><div class="technical-grid"><div class="source"><strong>Station ID</strong><div>${esc(id)}</div></div><div class="source"><strong>Source</strong><div>NOAA CO-OPS Data API</div></div><div class="source"><strong>Prediction datum</strong><div>${esc(datum)}</div></div><div class="source"><strong>Time basis</strong><div>${esc(zone)}</div></div></div><p><a href="/sources">Read the full source and methodology record</a></p></details>`,
     {
       title: `${title} tide times and water levels | Tide & Marine Conditions`,
@@ -750,13 +797,14 @@ async function charitySearch(env, site, origin, query) {
     },
   );
 }
-function entityPage(site, entity, origin, id) {
+function entityPage(site, entity, origin, id, records = []) {
+  const related = relatedEntitySection(site, entity, id, records);
   if (site.projection.includes("tide-marine"))
-    return tideEntityPage(site, entity, origin, id);
+    return tideEntityPage(site, entity, origin, id, related);
   if (site.projection.includes("charitysignal"))
     return charityEntityPage(site, entity, origin, id);
   if (site.projection.includes("floodingfacts"))
-    return floodEntityPage(site, entity, origin, id);
+    return floodEntityPage(site, entity, origin, id, related);
   const hidden = new Set([
     "predictions",
     "observations",
@@ -821,7 +869,7 @@ function entityPage(site, entity, origin, id) {
     id;
   return shell(
     site,
-    `<p class="eyebrow">Official ${esc(site.entity)} evidence</p><h1>${esc(title)}</h1><div class="notice">Source fields are shown as published in the approved projection. Unknown and unavailable values are not inferred.</div>${locatorMap(entity, title)}${evidenceChart(entity)}${facts}${tables}<p><a href="/sources">Source, licence and methodology</a></p>`,
+    `<p class="eyebrow">Official ${esc(site.entity)} evidence</p><h1>${esc(title)}</h1><div class="notice">Source fields are shown as published in the approved projection. Unknown and unavailable values are not inferred.</div>${locatorMap(entity, title)}${evidenceChart(entity)}${facts}${tables}${related}<p><a href="/sources">Source, licence and methodology</a></p>`,
     {
       title: `${title} · ${site.name}`,
       description: `Official ${site.entity} evidence for ${title}, with source and currentness.`,
@@ -1329,7 +1377,7 @@ export default {
           { "x-robots-tag": "noindex" },
         );
       return response(
-        entityPage(site, entity, origin, id),
+        entityPage(site, entity, origin, id, state.data?.entities || []),
         200,
         previewHeaders,
       );
