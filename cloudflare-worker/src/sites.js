@@ -111,7 +111,7 @@ export const sites = {
     count: "source verification in progress",
     sources: [],
     projection: "public-projections/boat-safety/catalog.json",
-    status: "source-pack-incomplete",
+    status: "projection-pending",
     examples: [
       "USCG approval and equipment identity",
       "Boat and model recall matching",
@@ -162,7 +162,7 @@ export const sites = {
     count: "corridor source pack incomplete",
     sources: [],
     projection: "public-projections/vehicle-import/catalog.json",
-    status: "source-pack-incomplete",
+    status: "projection-pending",
     examples: [
       "Origin-to-destination rule checklist",
       "Model, fuel and emissions evidence",
