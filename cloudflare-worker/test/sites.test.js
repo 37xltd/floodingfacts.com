@@ -428,6 +428,51 @@ test("AustralianCompanyData explains a verified company name change", () => {
   assert.match(html, /Projection generated 30 Aug 2026/);
 });
 
+test("Listed Building Facts explains designation evidence and limits", () => {
+  const entity = {
+    id: "1021466",
+    name: "20 and 20A Whitbourne Springs",
+    grade: "II",
+    designation_date: "1987-11-05",
+    designation_status: "Current in source snapshot",
+    snapshot_date: "2026-08-22",
+    official_url: "https://historicengland.org.uk/listing/the-list/list-entry/1021466",
+    latitude: 51.198831,
+    longitude: -2.239117,
+    _projectionGeneratedAt: "2026-09-03T21:27:00Z",
+  };
+  const html = entityPage(sites.heritage, entity, "https://listedbuildingfacts.com", entity.id);
+  assert.match(html, /grade, designation date and official entry/);
+  assert.match(html, /What the record establishes/);
+  assert.match(html, /Before planning work/);
+  assert.match(html, /source data were captured/);
+  assert.match(html, /Open the official list entry/);
+  assert.equal(entityIndexable(sites.heritage, entity), true);
+});
+
+test("FCC ID Check turns a grant row into a useful authorisation trail", () => {
+  const entity = {
+    id: "2A222-SDB",
+    applicant: "Shenzhen Zhongyou Hulian Technology Co., Ltd",
+    country: "China",
+    application_purpose: "Original Equipment",
+    first_action_date: "2022-05-05",
+    latest_action_date: "2022-05-05",
+    lower_frequency_mhz: 2412,
+    upper_frequency_mhz: 2462,
+    grant_rows: 1,
+    grantee_code: "2A222",
+    _projectionGeneratedAt: "2026-09-03T21:27:00Z",
+  };
+  const html = entityPage(sites.fcc, entity, "https://fccidcheck.com", entity.id);
+  assert.match(html, /applicant, frequencies and FCC action dates/);
+  assert.match(html, /2,412–2,462 MHz/);
+  assert.match(html, /What this result answers/);
+  assert.match(html, /Check the physical label/);
+  assert.match(html, /excludes applicant addresses/);
+  assert.equal(entityIndexable(sites.fcc, entity), true);
+});
+
 test("large register pages must pass a source-specific index-quality gate", () => {
   assert.equal(
     entityIndexable(sites.charity, {

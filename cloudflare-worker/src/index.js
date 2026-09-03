@@ -255,6 +255,23 @@ function entityIndexable(site, entity) {
     return Boolean(entity.label && entity.riverName && entity.measures?.length);
   if (site.projection.includes("tide-marine"))
     return Boolean(entity.name && (entity.predictions?.length || entity.observations?.length));
+  if (site.projection.includes("heritage-atlas"))
+    return Boolean(
+      entity.name &&
+        entity.grade &&
+        entity.designation_date &&
+        entity.official_url &&
+        coordinatePair(entity),
+    );
+  if (site.projection.includes("fcc-equipment"))
+    return Boolean(
+      entity.id &&
+        entity.applicant &&
+        entity.latest_action_date &&
+        entity.application_purpose &&
+        Number.isFinite(Number(entity.lower_frequency_mhz)) &&
+        Number.isFinite(Number(entity.upper_frequency_mhz)),
+    );
   return true;
 }
 const routeValue = (value) => encodeURIComponent(String(value ?? "").trim());
@@ -822,6 +839,10 @@ function entityPage(site, entity, origin, id) {
     return asicEntityPage(site, entity, origin, id);
   if (site.projection.includes("floodingfacts"))
     return floodEntityPage(site, entity, origin, id);
+  if (site.projection.includes("heritage-atlas"))
+    return heritageEntityPage(site, entity, origin, id);
+  if (site.projection.includes("fcc-equipment"))
+    return fccEntityPage(site, entity, origin, id);
   const hidden = new Set([
     "predictions",
     "observations",
@@ -890,6 +911,60 @@ function entityPage(site, entity, origin, id) {
     {
       title: `${title} · ${site.name}`,
       description: `Official ${site.entity} evidence for ${title}, with source and currentness.`,
+      canonical: origin + `/entity/${encodeURIComponent(id)}`,
+      report: true,
+    },
+  );
+}
+
+function heritageEntityPage(site, entity, origin, id) {
+  const title = entity.name || `Listed place ${id}`;
+  const officialUrl = entity.official_url || "https://historicengland.org.uk/listing/the-list/";
+  const current = String(entity.designation_status || "").toLowerCase().includes("current");
+  const gradeMeaning = {
+    I: "Grade I is the highest listed-building category in England.",
+    "II*": "Grade II* identifies a particularly important building of more than special interest.",
+    II: "Grade II identifies a building of special architectural or historic interest.",
+  }[entity.grade] || "The designation grade is reproduced exactly as published by the source.";
+  return shell(
+    site,
+    `<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Listed Building Facts</a> / <span>${esc(title)}</span></nav>
+    <section class="station-hero"><div class="station-title" style="background:linear-gradient(145deg,${site.dark},#6b4c25)"><span class="pill">${esc(entity.grade || "Grade unavailable")}</span><p class="eyebrow" style="color:#ffe1b0">Official designation evidence</p><h1>${esc(title)}</h1><p class="lead">List entry ${esc(id)} · ${current ? "current in the source snapshot" : esc(entity.designation_status || "status unavailable")}</p></div><aside class="reading-card"><div><p class="eyebrow">Designated</p><div class="reading-value" style="font-size:clamp(2rem,4vw,3.4rem)">${esc(prettyDate(entity.designation_date))}</div><p>${esc(gradeMeaning)}</p></div><p class="fresh">Source snapshot ${esc(prettyDate(entity.snapshot_date))}</p></aside></section>
+    <div class="actions"><a class="button" href="${esc(officialUrl)}" rel="external">Open the official list entry ↗</a><a class="button secondary" href="/search?q=${encodeURIComponent(title)}">Find another listed place</a></div>
+    <section class="evidence-grid" aria-label="Designation summary"><article class="evidence-card"><small>List entry</small><strong>${esc(id)}</strong><span>Use this stable identifier when checking the official record</span></article><article class="evidence-card"><small>Published grade</small><strong>${esc(entity.grade || "Unavailable")}</strong><span>The source category is retained without reinterpretation</span></article><article class="evidence-card"><small>Published state</small><strong>${current ? "Current" : esc(entity.designation_status || "Unavailable")}</strong><span>Status in the dated source snapshot, not a live legal opinion</span></article></section>
+    ${locatorMap(entity, title)}
+    <section class="explain"><article class="panel"><p class="eyebrow">What the record establishes</p><h2>A named designation linked to an official entry</h2><p>The approved source projection links this name, identifier, grade, designation date and mapped point. It is useful for confirming identity and opening the primary record. The map is location context only: it does not reproduce the legal designation boundary.</p></article><article class="panel warning"><p class="eyebrow">Before planning work</p><h2>Check the official entry and local authority</h2><p>Listing can affect work to a building and sometimes associated structures. This page does not decide whether consent is needed, describe the full extent of protection or replace professional and local-authority advice.</p></article></section>
+    <div class="notice"><strong>Freshness and limits:</strong> source data were captured for the ${esc(prettyDate(entity.snapshot_date))} snapshot and this projection was generated ${esc(prettyTime(entity._projectionGeneratedAt))}. Names, coordinates and status may later change; the official list entry is the controlling reference.</div>
+    <details class="technical"><summary>Complete approved source fields</summary><div class="technical-grid">${Object.entries(entity).filter(([key, value]) => !key.startsWith("_") && value !== null && value !== undefined && value !== "").map(([key, value]) => `<div class="source"><strong>${esc(label(key))}</strong><div>${key === "official_url" ? `<a href="${esc(value)}" rel="external">Open official record ↗</a>` : esc(value)}</div></div>`).join("")}</div><p><a href="/sources">Source, licence and methodology</a></p></details>`,
+    {
+      title: `${title}: grade, designation date and official entry | Listed Building Facts`,
+      description: `Official listed-building evidence for ${title}: list entry ${id}, published grade, designation date, mapped context and source date.`,
+      canonical: origin + `/entity/${encodeURIComponent(id)}`,
+      report: true,
+    },
+  );
+}
+
+function fccEntityPage(site, entity, origin, id) {
+  const title = entity.applicant || entity.grantee_registered_name || `FCC ID ${id}`;
+  const low = Number(entity.lower_frequency_mhz);
+  const high = Number(entity.upper_frequency_mhz);
+  const frequency = Number.isFinite(low) && Number.isFinite(high)
+    ? low === high ? `${low.toLocaleString("en-GB")} MHz` : `${low.toLocaleString("en-GB")}–${high.toLocaleString("en-GB")} MHz`
+    : "Unavailable";
+  const officialUrl = `https://apps.fcc.gov/oetcf/eas/reports/GenericSearch.cfm`;
+  return shell(
+    site,
+    `<nav class="crumbs" aria-label="Breadcrumb"><a href="/">FCC Equipment ID Lookup</a> / <span>${esc(id)}</span></nav>
+    <section class="station-hero"><div class="station-title" style="background:linear-gradient(145deg,${site.dark},#2f417d)"><span class="pill">FCC ID ${esc(id)}</span><p class="eyebrow" style="color:#fff1a8">Equipment authorisation evidence</p><h1>${esc(title)}</h1><p class="lead">${esc(entity.application_purpose || "Application purpose unavailable")} · grantee code ${esc(entity.grantee_code || "unavailable")}</p></div><aside class="reading-card"><div><p class="eyebrow">Published frequency range</p><div class="reading-value" style="font-size:clamp(2rem,4vw,3.4rem)">${esc(frequency)}</div><p>Lower and upper bounds retained from the approved grant projection.</p></div><p class="fresh">Latest action ${esc(prettyDate(entity.latest_action_date))}</p></aside></section>
+    <div class="actions"><a class="button" href="${officialUrl}" rel="external">Search the official FCC database ↗</a><a class="button secondary" href="/search?q=${encodeURIComponent(id)}">Check another FCC ID</a></div>
+    <section class="evidence-grid" aria-label="Authorisation summary"><article class="evidence-card"><small>Applicant</small><strong>${esc(title)}</strong><span>Organisation name published with this authorisation record</span></article><article class="evidence-card"><small>Application purpose</small><strong>${esc(entity.application_purpose || "Unavailable")}</strong><span>Purpose wording retained from the source</span></article><article class="evidence-card"><small>Published actions</small><strong>${esc(entity.grant_rows || 0)}</strong><span>Rows consolidated for this exact FCC ID</span></article></section>
+    <section class="explain"><article class="panel"><p class="eyebrow">What this result answers</p><h2>The identifier appears in the approved FCC grant projection</h2><p>The page connects the exact FCC ID to the shown applicant, grantee code, application purpose, action dates and frequency bounds. It is an identity and authorisation trail, not a product review or a claim that every unit bearing a similar label is genuine.</p></article><article class="panel warning"><p class="eyebrow">Check the physical label</p><h2>Match the complete identifier</h2><p>Model names and marketing names can cover several radio variants. Compare every character of the FCC ID on the device with the official database result. For exhibits, grant conditions and current regulatory status, use the FCC database.</p></article></section>
+    <div class="notice"><strong>Freshness and privacy:</strong> source actions run from ${esc(prettyDate(entity.first_action_date))} to ${esc(prettyDate(entity.latest_action_date))}; the public projection was generated ${esc(prettyTime(entity._projectionGeneratedAt))}. It excludes applicant addresses, contacts, signatures, email addresses and private exhibits.</div>
+    <details class="technical"><summary>Complete approved source fields</summary><div class="technical-grid">${Object.entries(entity).filter(([key, value]) => !key.startsWith("_") && value !== null && value !== undefined && value !== "").map(([key, value]) => `<div class="source"><strong>${esc(label(key))}</strong><div>${esc(value)}</div></div>`).join("")}</div><p><a href="/sources">Source, licence and methodology</a></p></details>`,
+    {
+      title: `${id}: applicant, frequencies and FCC action dates | FCC ID Check`,
+      description: `FCC equipment-authorisation evidence for ${id}: applicant, grantee code, purpose, frequencies and dated actions.`,
       canonical: origin + `/entity/${encodeURIComponent(id)}`,
       report: true,
     },
@@ -1415,7 +1490,10 @@ export default {
           { "x-robots-tag": "noindex" },
         );
       const id = decodeURIComponent(url.pathname.slice(8));
-      const entity = await getEntity(env, site, id);
+      const entity =
+        state.data?.entities?.find(
+          (record) => String(entityId(record)) === String(id),
+        ) || (await getEntity(env, site, id));
       if (!entity)
         return response(
           shell(

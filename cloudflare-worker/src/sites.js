@@ -136,7 +136,7 @@ export const sites = {
     count: "experiment gated",
     sources: [],
     projection: "public-projections/fcc-equipment/catalog.json",
-    status: "source-pack-incomplete",
+    status: "projection-pending",
     examples: [
       "FCC ID and grant identity",
       "Equipment class and authorisation date",
@@ -326,7 +326,7 @@ export const sites = {
     count: "entity qualification pending",
     sources: [],
     projection: "public-projections/heritage-atlas/catalog.json",
-    status: "source-pack-incomplete",
+    status: "projection-pending",
     examples: [
       "Official designation and identifier",
       "Map, boundary and nearby context",
