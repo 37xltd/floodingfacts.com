@@ -260,7 +260,7 @@ export const sites = {
       "Environment Agency stations, measures, latest readings, areas and warnings, with thresholds and missing-data states kept explicit.",
     search: "River, station or nearby place",
     entity: "station",
-    count: "5,351 latest measures",
+    count: "5,523 stations · 7,361 measures",
     sources: [
       {
         name: "Environment Agency Flood Monitoring API",
