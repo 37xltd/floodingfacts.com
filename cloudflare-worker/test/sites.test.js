@@ -369,6 +369,8 @@ test("Tide turns predictions and observations into a planning dashboard", () => 
   assert.match(html, /Next published high and low tides/);
   assert.match(html, /Open NOAA station/);
   assert.match(html, /For navigation or safety/);
+  assert.match(html, /source collected at the observation and prediction times/);
+  assert.match(html, /evidence rechecked when the approved projection was generated/);
   assert.match(html, /Download report \(PDF\)/);
 });
 
@@ -397,6 +399,8 @@ test("CharitySignal turns approved organisation fields into an evidence view", (
   assert.match(html, /Income less expenditure/);
   assert.match(html, /Open official register/);
   assert.match(html, /Complete approved organisation record/);
+  assert.match(html, /source collected in the Charity Commission extract dated 30 August 2026/);
+  assert.match(html, /evidence rechecked when the approved projection was generated/);
 });
 
 test("AustralianCompanyData explains a verified company name change", () => {
