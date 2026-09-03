@@ -392,6 +392,35 @@ test("CharitySignal turns approved organisation fields into an evidence view", (
   assert.match(html, /Complete approved organisation record/);
 });
 
+test("AustralianCompanyData explains a verified company name change", () => {
+  const entity = {
+    acn: "000024064",
+    abn: "25000024064",
+    company_name: "PABCO PRODUCTS PTY LTD",
+    current_name: "TREMCO CPG AUSTRALIA PTY LTD",
+    current_name_start_date: "08/11/2019",
+    entity_type: "APTY",
+    company_class: "LMSH",
+    company_subclass: "PROP",
+    status: "REGD",
+    registration_date: "11/06/1931",
+    previous_state_of_registration: "NSW",
+    state_registration_number: "01379120",
+    _projectionGeneratedAt: "2026-08-30T00:00:00Z",
+  };
+  const html = entityPage(
+    sites.asic,
+    entity,
+    "https://australiancompanydata.com",
+    entity.acn,
+  );
+  assert.match(html, /ACN, status and name history/);
+  assert.match(html, /Previously PABCO PRODUCTS PTY LTD/);
+  assert.match(html, /What this page answers/);
+  assert.match(html, /does not publish directors, addresses or personal contact details/);
+  assert.match(html, /Projection generated 30 Aug 2026/);
+});
+
 test("large register pages must pass a source-specific index-quality gate", () => {
   assert.equal(
     entityIndexable(sites.charity, {

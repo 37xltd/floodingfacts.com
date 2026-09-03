@@ -467,9 +467,12 @@ function catalogGroupPage(site, catalog, origin, kind, id) {
     })
     .join("");
   const noun = kind === "state" ? "tide and water-level" : "river-level";
+  const groupEvidence = kind === "state"
+    ? `<section class="evidence-grid"><article class="evidence-card"><small>Published stations</small><strong>${matches.length}</strong><span>Only stations present in the approved NOAA projection</span></article><article class="evidence-card"><small>Prediction coverage</small><strong>${matches.filter((row) => Number(row.predictionCount) > 0).length}</strong><span>Stations with stored prediction records</span></article><article class="evidence-card"><small>Observation coverage</small><strong>${matches.filter((row) => Number(row.observationCount) > 0).length}</strong><span>Stations with stored observation records</span></article></section><section class="explain"><article class="panel"><h2>Choose by station, not state average</h2><p>Tide timing and height vary around a coastline. Open the named station nearest the place and waterway you actually need, then retain its datum and local-time basis when comparing predictions.</p></article><article class="panel warning"><h2>Planning context, not navigation</h2><p>These station pages organise official NOAA records. They do not replace navigational charts, local notices, weather warnings or on-water judgement.</p></article></section>`
+    : `<section class="evidence-grid"><article class="evidence-card"><small>Monitoring stations</small><strong>${matches.length}</strong><span>Separate instruments on this named watercourse</span></article><article class="evidence-card"><small>Latest readings</small><strong>${matches.filter((row) => row.measures?.length).length}</strong><span>Stations with a reading in the current response</span></article><article class="evidence-card"><small>Named places</small><strong>${new Set(matches.map((row) => row.town).filter(Boolean)).size}</strong><span>Published locality labels, not inferred boundaries</span></article></section><section class="explain"><article class="panel"><h2>Why nearby stations can disagree</h2><p>Each gauge measures its own instrument and location. Tributaries, structures, rainfall and the time of observation can produce different readings on the same named river, so compare timestamps and units before comparing values.</p></article><article class="panel warning"><h2>A reading is not a warning</h2><p>Use the Environment Agency warning service for current alerts and safety guidance. This browse page is a monitoring index, not an address-level flood-risk assessment.</p></article></section>`;
   return shell(
     site,
-    `<nav class="crumbs"><a href="/">${esc(site.name)}</a> / <span>${esc(id)}</span></nav><p class="eyebrow">Verified geographic coverage</p><h1>${esc(labelText)}</h1><p class="lead">Browse ${matches.length} official ${noun} station${matches.length === 1 ? "" : "s"}. Each station page keeps the identifier, source date, units and limitations beside the evidence.</p><section class="grid">${links}</section>`,
+    `<nav class="crumbs"><a href="/">${esc(site.name)}</a> / <span>${esc(id)}</span></nav><p class="eyebrow">Verified geographic coverage</p><h1>${esc(labelText)}</h1><p class="lead">Browse ${matches.length} official ${noun} station${matches.length === 1 ? "" : "s"}. Each station page keeps the identifier, source date, units and limitations beside the evidence.</p>${groupEvidence}<section class="grid">${links}</section>`,
     {
       title: `${labelText} | ${site.name}`,
       description: `Browse ${matches.length} official ${noun} stations for ${id}, with source-linked entity pages and currentness context.`,
@@ -707,6 +710,23 @@ function money(value) {
       }).format(number)
     : "Unavailable";
 }
+function asicEntityPage(site, entity, origin, id) {
+  const title = entity.current_name || entity.company_name || `Company ${id}`;
+  const formerName = entity.company_name && entity.company_name !== entity.current_name
+    ? entity.company_name
+    : null;
+  const officialUrl = "https://connectonline.asic.gov.au/RegistrySearch/faces/landing/SearchRegisters.jspx";
+  return shell(
+    site,
+    `<nav class="crumbs" aria-label="Breadcrumb"><a href="/">AustralianCompanyData</a> / <span>${esc(id)}</span></nav><section class="station-hero"><div class="station-title" style="background:linear-gradient(145deg,${site.dark},#674800)"><span class="pill">${entity.status === "REGD" ? "Registered" : "Status " + esc(entity.status || "unavailable")}</span><p class="eyebrow" style="color:#ffe8a8">Australian company identity</p><h1>${esc(title)}</h1><p class="lead">ACN ${esc(entity.acn || id)}${entity.abn ? ` · ABN ${esc(entity.abn)}` : ""}</p></div><aside class="reading-card"><div><p class="eyebrow">Registered from</p><div class="reading-value" style="font-size:clamp(2rem,4vw,3.5rem)">${esc(entity.registration_date || "Unavailable")}</div><p>The date is reproduced exactly as published in the approved ASIC snapshot.</p></div><p class="fresh">Current name began ${esc(entity.current_name_start_date || "date unavailable")}</p></aside></section><div class="actions"><a class="button" href="${officialUrl}" rel="external">Check the ASIC register ↗</a><a class="button secondary" href="/search?q=${encodeURIComponent(entity.acn || id)}">Check another ACN</a></div><section class="evidence-grid"><article class="evidence-card"><small>Current register status</small><strong>${esc(entity.status || "Unavailable")}</strong><span>The source code is retained rather than expanded into an inferred legal conclusion</span></article><article class="evidence-card"><small>Entity type</small><strong>${esc(entity.entity_type || "Unavailable")}</strong><span>ASIC type code as published</span></article><article class="evidence-card"><small>Class · subclass</small><strong>${esc([entity.company_class, entity.company_subclass].filter(Boolean).join(" · ") || "Unavailable")}</strong><span>Published classification codes</span></article></section><section class="explain"><article class="panel"><p class="eyebrow">Name history signal</p><h2>${formerName ? `Previously ${esc(formerName)}` : "No separate former name in this projection"}</h2><p>${formerName ? `The source records ${esc(title)} as the current name and ${esc(formerName)} as the earlier published company name. The current-name start date is ${esc(entity.current_name_start_date || "not available")}.` : "A missing former-name signal does not prove that the company has never changed name; use the official register for the complete history."}</p></article><article class="panel"><p class="eyebrow">Registration context</p><h2>${esc(entity.previous_state_of_registration || "State not published")}</h2><p>${entity.state_registration_number ? `The projection retains state registration number ${esc(entity.state_registration_number)} for exact identity checking.` : "No earlier state registration number is published in this projection."} This page does not publish directors, addresses or personal contact details.</p></article></section><div class="notice"><strong>What this page answers:</strong> whether the approved ASIC snapshot links this exact ACN to the shown current name, status and identifiers. It does not provide credit, ownership or legal advice. Projection generated ${esc(prettyTime(entity._projectionGeneratedAt))}.</div><details class="technical"><summary>Approved source fields</summary><div class="technical-grid">${Object.entries(entity).filter(([key, value]) => !key.startsWith("_") && value !== null && value !== undefined && value !== "").map(([key, value]) => `<div class="source"><strong>${esc(label(key))}</strong><div>${esc(value)}</div></div>`).join("")}</div><p><a href="/sources">Source, licence and methodology</a></p></details>`,
+    {
+      title: `${title}: ACN, status and name history | AustralianCompanyData`,
+      description: `ASIC company identity for ${title}, including ACN, ABN, registration status, type and published name history.`,
+      canonical: origin + `/entity/${encodeURIComponent(id)}`,
+      report: true,
+    },
+  );
+}
 function charityEntityPage(site, entity, origin, id) {
   const title = entity.charity_name || `Charity ${id}`;
   const active =
@@ -793,6 +813,8 @@ function entityPage(site, entity, origin, id) {
     return tideEntityPage(site, entity, origin, id);
   if (site.projection.includes("charitysignal"))
     return charityEntityPage(site, entity, origin, id);
+  if (site.projection.includes("australiancompanydata"))
+    return asicEntityPage(site, entity, origin, id);
   if (site.projection.includes("floodingfacts"))
     return floodEntityPage(site, entity, origin, id);
   const hidden = new Set([
