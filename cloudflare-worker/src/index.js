@@ -1452,3 +1452,23 @@ export default {
     );
   },
 };
+
+// FloodingFacts has a river-monitoring identity even though this Worker can host
+// several evidence products. Keep the override scoped to this site only.
+const baseCss = css;
+css = function siteSpecificCss(site) {
+  const common = baseCss(site);
+  if (site.name !== "FloodingFacts") return common;
+  return `${common}
+  body{background-color:#e9f4f7;background-image:repeating-radial-gradient(ellipse at 90% 5%,transparent 0,transparent 28px,#7db7c522 29px,#7db7c522 30px)}
+  header{max-width:none;background:#07354a;color:#fff;border-bottom:6px solid #35c6e8;padding:1rem max(2rem,calc((100vw - 1180px)/2))}
+  header nav a{color:#d8edf4}.brand b{border-radius:50%;background:#35c6e8;color:#07354a;box-shadow:none}
+  main{padding-top:2.5rem}.hero{grid-template-columns:1.1fr .9fr;align-items:stretch;background:#fff;border:1px solid #a9c6cf;padding:2rem;margin-bottom:2rem}
+  .hero h1{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:clamp(2.8rem,5vw,5.3rem);line-height:.93;letter-spacing:-.06em}
+  .hero .stat{background:#07354a;color:#fff;border:0;border-top:8px solid #35c6e8;padding:2rem;display:flex;flex-direction:column;justify-content:end}
+  .search{border-radius:0;box-shadow:none;border:2px solid #07354a}.search button,.button{border-radius:0;background:#35c6e8;color:#07354a}
+  .station-title{border-radius:0;background:#07354a}.reading-card,.evidence-card,.panel,.visual-panel,.chart-panel{border-radius:0;border-color:#9ebdc7;box-shadow:none}
+  .reading-value{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.feature-band{border-radius:0;background:#07354a}
+  @media(max-width:720px){header nav{overflow:auto;flex-wrap:nowrap;width:100%}.hero{display:block;padding:1.25rem}.hero .stat{margin-top:1.25rem}.hero h1{font-size:3rem}}
+  `;
+};
