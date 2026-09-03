@@ -445,7 +445,8 @@ test("Listed Building Facts explains designation evidence and limits", () => {
   assert.match(html, /grade, designation date and official entry/);
   assert.match(html, /What the record establishes/);
   assert.match(html, /Before planning work/);
-  assert.match(html, /source data were captured/);
+  assert.match(html, /source collected 22 August 2026/);
+  assert.match(html, /evidence rechecked when the approved projection was generated/);
   assert.match(html, /Open the official list entry/);
   assert.equal(entityIndexable(sites.heritage, entity), true);
 });
