@@ -1069,16 +1069,20 @@ export default {
           ...[...categories].map((id) => `/category/${routeValue(id)}`),
         ];
       } else if (site.projection.includes("tide-marine")) {
-        extraPaths = [
-          ...new Set(records.map((record) => record.state).filter(Boolean)),
-        ].map((state) => `/state/${routeValue(state)}`);
+        const states = new Map();
+        for (const record of records)
+          if (record.state)
+            states.set(record.state, (states.get(record.state) || 0) + 1);
+        extraPaths = [...states]
+          .filter(([, count]) => count >= 5)
+          .map(([state]) => `/state/${routeValue(state)}`);
       } else if (site.projection.includes("floodingfacts")) {
         const rivers = new Map();
         for (const record of records)
           if (record.river)
             rivers.set(record.river, (rivers.get(record.river) || 0) + 1);
         extraPaths = [...rivers]
-          .filter(([, count]) => count >= 2)
+          .filter(([, count]) => count >= 5)
           .map(([river]) => `/river/${routeValue(river)}`);
       }
       return new Response(
@@ -1191,6 +1195,11 @@ export default {
           site.projection.includes("floodingfacts")))
     ) {
       const id = decodeURIComponent(catalogGroup[2]);
+      const groupCount = routeRecords(
+        state.data?.entities || [],
+        catalogGroup[1] === "state" ? "state" : "river",
+        id,
+      ).length;
       const page = catalogGroupPage(
         site,
         state.data,
@@ -1202,7 +1211,9 @@ export default {
         return response(
           page,
           200,
-          crawlReady ? {} : { "x-robots-tag": "noindex" },
+          crawlReady && groupCount >= 5
+            ? {}
+            : { "x-robots-tag": "noindex, follow" },
         );
     }
     if (url.pathname === "/")

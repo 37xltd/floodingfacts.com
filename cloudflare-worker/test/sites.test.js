@@ -288,6 +288,10 @@ test("Tide and FloodingFacts expose durable geographic browse pages", async () =
           predictionCount: 12,
           observationCount: 3,
         },
+        { stationId: "2", name: "Second", state: "NY" },
+        { stationId: "3", name: "Third", state: "NY" },
+        { stationId: "4", name: "Fourth", state: "NY" },
+        { stationId: "5", name: "Fifth", state: "NY" },
       ],
     },
     river: {
@@ -296,6 +300,9 @@ test("Tide and FloodingFacts expose durable geographic browse pages", async () =
       entities: [
         { id: "A", name: "Upper Gauge", river: "River Test", town: "Alpha" },
         { id: "B", name: "Lower Gauge", river: "River Test", town: "Beta" },
+        { id: "C", name: "Middle Gauge", river: "River Test", town: "Gamma" },
+        { id: "D", name: "East Gauge", river: "River Test", town: "Delta" },
+        { id: "E", name: "West Gauge", river: "River Test", town: "Epsilon" },
       ],
     },
   };
