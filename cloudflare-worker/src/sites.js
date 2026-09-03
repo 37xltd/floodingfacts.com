@@ -2,7 +2,7 @@ export const sites = {
   tide: {
     name: "Tide & Marine Conditions",
     canonicalHost: "tide99.com",
-    analyticsId: "G-PYM0VS93F6",
+    analyticsId: "G-SWVLQ1LFZ7",
     eyebrow: "US tide & marine conditions",
     icon: "≈",
     accent: "#00d4c8",
@@ -33,7 +33,7 @@ export const sites = {
   asic: {
     name: "AustralianCompanyData",
     canonicalHost: "australiancompanydata.com",
-    analyticsId: "G-X8V7G1S3EH",
+    analyticsId: "G-SWVLQ1LFZ7",
     eyebrow: "Verified ASIC company register",
     icon: "AU",
     accent: "#ffb000",
@@ -64,7 +64,7 @@ export const sites = {
   charity: {
     name: "CharitySignal",
     canonicalHost: "charitysignal.co.uk",
-    analyticsId: "G-P6SC2E9YMW",
+    analyticsId: "G-SWVLQ1LFZ7",
     eyebrow: "England & Wales charity register",
     icon: "CS",
     accent: "#8c5cff",
@@ -96,7 +96,7 @@ export const sites = {
   boat: {
     name: "BoatSafetyCheck",
     canonicalHost: "boatrecallcheck.com",
-    analyticsId: "G-K007J6PZE2",
+    analyticsId: "G-SWVLQ1LFZ7",
     eyebrow: "US recreational boat safety evidence",
     icon: "⚓",
     accent: "#ff7a45",
@@ -122,7 +122,7 @@ export const sites = {
   fcc: {
     name: "FCC Equipment ID Lookup",
     canonicalHost: "fccidcheck.com",
-    analyticsId: "G-SXB3L22RXX",
+    analyticsId: "G-SWVLQ1LFZ7",
     eyebrow: "Small, fast equipment-authorisation experiment",
     icon: "FCC",
     accent: "#ffd84d",
@@ -147,7 +147,7 @@ export const sites = {
   vehicleimport: {
     name: "Vehicle Import Eligibility Checker",
     canonicalHost: "vehicleimportfacts.com",
-    analyticsId: "G-EL87TDLDLS",
+    analyticsId: "G-SWVLQ1LFZ7",
     eyebrow: "Focused cross-border vehicle evidence",
     icon: "↔",
     accent: "#a7f35a",
@@ -249,7 +249,7 @@ export const sites = {
   river: {
     name: "FloodingFacts",
     canonicalHost: "floodingfacts.com",
-    analyticsId: "G-X8V7G1S3EH",
+    analyticsId: "G-SWVLQ1LFZ7",
     eyebrow: "Live river readings & flood warnings",
     icon: "↟",
     accent: "#2fc4ff",
@@ -280,7 +280,7 @@ export const sites = {
   roads: {
     name: "PlaceChecker",
     canonicalHost: "placechecker.co.uk",
-    analyticsId: "G-X8V7G1S3EH",
+    analyticsId: "G-SWVLQ1LFZ7",
     eyebrow: "Bounded local road-safety evidence",
     icon: "!",
     accent: "#ff784f",
@@ -312,7 +312,7 @@ export const sites = {
   heritage: {
     name: "Listed Building Facts",
     canonicalHost: "listedbuildingfacts.com",
-    analyticsId: "G-X8V7G1S3EH",
+    analyticsId: "G-SWVLQ1LFZ7",
     eyebrow: "UK heritage atlas",
     icon: "H",
     accent: "#d6a866",
@@ -595,7 +595,7 @@ export const sites = {
   tender: {
     name: "TenderTenderTender",
     canonicalHost: "tendertendertender.com",
-    analyticsId: "G-X8V7G1S3EH",
+    analyticsId: "G-SWVLQ1LFZ7",
     eyebrow: "UK public procurement history",
     icon: "T",
     accent: "#ffd84d",

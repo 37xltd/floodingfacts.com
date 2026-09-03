@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import worker, { entityPage } from "../src/index.js";
+import worker, { entityIndexable, entityPage } from "../src/index.js";
 import { sites } from "../src/sites.js";
 
 for (const key of Object.keys(sites)) {
@@ -115,7 +115,7 @@ test("analytics is consent-first and only emitted on an eligible canonical host"
   };
   const canonical = await worker.fetch(new Request("https://tide99.com/"), env);
   const html = await canonical.text();
-  assert.equal((html.match(/G-PYM0VS93F6/g) || []).length, 1);
+  assert.equal((html.match(/G-SWVLQ1LFZ7/g) || []).length, 1);
   assert.match(html, /No analytics loads before you accept/);
   assert.match(html, /analytics_storage:'granted'/);
   assert.match(html, /ad_storage:'denied'/);
@@ -127,7 +127,7 @@ test("analytics is consent-first and only emitted on an eligible canonical host"
     new Request("https://us-tide-marine-conditions.example.workers.dev/"),
     env,
   );
-  assert.doesNotMatch(await preview.text(), /G-PYM0VS93F6|data-consent/);
+  assert.doesNotMatch(await preview.text(), /G-SWVLQ1LFZ7|data-consent/);
 });
 
 test("large company projections use R2-backed sitemap shards", async () => {
@@ -176,9 +176,6 @@ test("FloodingFacts turns raw station fields into a user-first dashboard", () =>
     },
     "https://floodingfacts.com",
     "1771TH",
-    [
-      { id: "1772TH", name: "Lower Letcombe", river: "Letcombe Brook", town: "Letcombe Regis", lat: 51.58, long: -1.44 },
-    ],
   );
   assert.match(html, /Letcombe Regis river level and station reading/);
   assert.match(html, /Latest published reading/);
@@ -194,9 +191,6 @@ test("FloodingFacts turns raw station fields into a user-first dashboard", () =>
   assert.match(html, /choose “Save as PDF”/);
   assert.match(html, /@page\{size:A4/);
   assert.match(html, /Evidence report · prepared/);
-  assert.match(html, /More monitoring on Letcombe Brook/);
-  assert.match(html, /Lower Letcombe/);
-  assert.match(html, /All stations on Letcombe Brook/);
   assert.doesNotMatch(html, />LiveReadingRetrievedAt</);
   assert.ok(
     html.indexOf("Technical record and provenance") <
@@ -209,6 +203,8 @@ test("TenderTenderTender exposes browse navigation and notice discovery", async 
     records: [
       {
         ocid: "ocds-test-1",
+        title: "Example building-services opportunity",
+        description: "Published procurement notice for building services.",
         buyer_id: "GB-CFS-123",
         buyer_organisation: "Example Council",
         classification_id: "45000000",
@@ -360,18 +356,12 @@ test("Tide turns predictions and observations into a planning dashboard", () => 
     },
     "https://tide99.com",
     "8518750",
-    [
-      { stationId: "8510560", name: "Montauk", state: "NY", lat: 41.05, long: -71.96 },
-    ],
   );
   assert.match(html, /The Battery tide times and water levels/);
   assert.match(html, /Latest stored observation/);
   assert.match(html, /Next published high and low tides/);
   assert.match(html, /Open NOAA station/);
   assert.match(html, /For navigation or safety/);
-  assert.match(html, /Nearby tide stations/);
-  assert.match(html, /Montauk/);
-  assert.match(html, /All stations in NY/);
   assert.match(html, /Download report \(PDF\)/);
 });
 
@@ -400,6 +390,48 @@ test("CharitySignal turns approved organisation fields into an evidence view", (
   assert.match(html, /Income less expenditure/);
   assert.match(html, /Open official register/);
   assert.match(html, /Complete approved organisation record/);
+});
+
+test("large register pages must pass a source-specific index-quality gate", () => {
+  assert.equal(
+    entityIndexable(sites.charity, {
+      charity_name: "Current Trust",
+      registered_charity_number: "123456",
+      charity_registration_status: "Registered",
+      date_of_extract: "2026-08-30",
+    }),
+    true,
+  );
+  assert.equal(
+    entityIndexable(sites.charity, {
+      charity_name: "Historic Trust",
+      registered_charity_number: "123456",
+      charity_registration_status: "Removed",
+      date_of_removal: "1995-01-16",
+      date_of_extract: "2026-08-30",
+    }),
+    false,
+  );
+  assert.equal(
+    entityIndexable(sites.asic, {
+      status: "REGD",
+      abn: "25000024064",
+      registration_date: "11/06/1931",
+      company_name: "PABCO PRODUCTS PTY LTD",
+      current_name: "TREMCO CPG AUSTRALIA PTY LTD",
+    }),
+    true,
+  );
+  assert.equal(
+    entityIndexable(sites.asic, {
+      status: "REGD",
+      abn: "25000024064",
+      registration_date: "11/06/1931",
+      company_name: "UNCHANGED PTY LTD",
+      current_name: "UNCHANGED PTY LTD",
+    }),
+    false,
+  );
 });
 
 for (const key of ["boat", "fcc", "vehicleimport"]) {

@@ -104,30 +104,11 @@ function shell(
   const analytics = analyticsEligible
     ? `<style>.consent{position:fixed;z-index:20;left:1rem;right:1rem;bottom:1rem;max-width:920px;margin:auto;display:grid;grid-template-columns:1fr auto;gap:.65rem 1.2rem;align-items:center;padding:1rem 1.2rem;border-radius:1rem;background:#fff;color:${site.dark};border:1px solid ${site.dark}33;box-shadow:0 18px 60px #0003}.consent[hidden]{display:none}.consent div{display:flex;gap:.55rem;flex-direction:column}.consent div:nth-child(2){flex-direction:row}.consent span,.consent a{font-size:.84rem}.consent button{border:0;border-radius:.65rem;padding:.7rem .9rem;background:${site.accent};color:${site.dark};font-weight:800;cursor:pointer}.consent .secondary-action{background:${site.pale};border:1px solid ${site.dark}33}@media(max-width:650px){.consent{grid-template-columns:1fr}.consent div:nth-child(2){flex-wrap:wrap}}</style><aside class="consent" data-consent hidden aria-label="Analytics choice"><div><strong>Help us improve ${esc(site.name)}</strong><span>With your permission, Google Analytics measures which public pages are useful. No analytics loads before you accept.</span></div><div><button type="button" data-accept>Allow analytics</button><button type="button" class="secondary-action" data-decline>Decline</button></div><a href="/privacy">Privacy details</a></aside><script>(function(){var id=${JSON.stringify(site.analyticsId)},box=document.querySelector('[data-consent]'),key='37x-analytics-consent';function load(){if(window.__37xGa)return;window.__37xGa=true;window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}window.gtag=gtag;gtag('consent','default',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});gtag('js',new Date());gtag('config',id,{allow_google_signals:false,allow_ad_personalization_signals:false});var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(id);document.head.appendChild(s)}var choice=localStorage.getItem(key);if(choice==='yes')load();else if(choice!=='no')box.hidden=false;box.querySelector('[data-accept]').onclick=function(){localStorage.setItem(key,'yes');box.hidden=true;load()};box.querySelector('[data-decline]').onclick=function(){localStorage.setItem(key,'no');box.hidden=true}})()</script>`
     : "";
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><meta name="description" content="${esc(description)}">${noindex ? '<meta name="robots" content="noindex,nofollow">' : ""}<link rel="canonical" href="${canonical}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="website"><meta name="theme-color" content="${site.dark}"><script type="application/ld+json">${schema}</script><style>${css(site)}${polishCss(site)}</style></head><body${report ? ` onbeforeprint="document.querySelectorAll('details').forEach(function(detail){detail.open=true})"` : ""}><a class="skip" href="#main">Skip to content</a><header><a class="brand" href="/"><b>${esc(site.icon)}</b><span>${esc(site.name)}</span></a><nav aria-label="Primary">${productNav}<a href="/about">About</a><a href="/sources">Sources &amp; method</a><a href="/corrections">Corrections</a><a href="/privacy">Privacy</a></nav></header><main id="main"><aside class="proof-strip" aria-label="Evidence standards"><span><i></i>Official-source records</span><span><i></i>Dates and coverage visible</span><span><i></i>Methods and limits explained</span></aside>${reportTools}${inner}</main><footer><span>${esc(site.name)} · a 37X evidence product</span><span>Facts retain source, date and limitations. <a href="/corrections">Report a correction</a> · <a href="/privacy">Privacy</a>.</span></footer>${analytics}${reportScript}</body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><meta name="description" content="${esc(description)}">${noindex ? '<meta name="robots" content="noindex,nofollow">' : ""}<link rel="canonical" href="${canonical}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="website"><meta name="theme-color" content="${site.dark}"><script type="application/ld+json">${schema}</script><style>${css(site)}</style></head><body${report ? ` onbeforeprint="document.querySelectorAll('details').forEach(function(detail){detail.open=true})"` : ""}><a class="skip" href="#main">Skip to content</a><header><a class="brand" href="/"><b>${esc(site.icon)}</b><span>${esc(site.name)}</span></a><nav aria-label="Primary">${productNav}<a href="/about">About</a><a href="/sources">Sources &amp; method</a><a href="/corrections">Corrections</a><a href="/privacy">Privacy</a></nav></header><main id="main">${reportTools}${inner}</main><footer><span>${esc(site.name)} · a 37X evidence product</span><span>Facts retain source, date and limitations. <a href="/corrections">Report a correction</a> · <a href="/privacy">Privacy</a>.</span></footer>${analytics}${reportScript}</body></html>`;
 }
 
 function css(s) {
   return `*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:${s.pale};color:${s.dark};font:16px/1.55 Inter,ui-sans-serif,system-ui,sans-serif}body:before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 88% 8%,${s.accent}24,transparent 32rem),radial-gradient(circle at 8% 48%,#ffffff9c,transparent 26rem);z-index:-1}a{color:inherit}.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:1rem;background:white;padding:.7rem;z-index:3}header,footer{display:flex;justify-content:space-between;align-items:center;gap:1rem;max-width:1180px;margin:auto;padding:1.2rem 2rem}.brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;font-weight:900}.brand b{display:grid;place-items:center;min-width:2.35rem;height:2.35rem;padding:0 .5rem;border-radius:.75rem;background:${s.accent};color:${s.dark};box-shadow:0 8px 24px ${s.dark}20}nav{display:flex;gap:1.15rem;align-items:center;flex-wrap:wrap}nav a{text-decoration:none;font-size:.9rem;font-weight:700}main{max-width:1180px;margin:auto;padding:4.5rem 2rem 6rem}.hero{display:grid;grid-template-columns:1.35fr .65fr;gap:4rem;align-items:end}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:.78rem;font-weight:850;color:${s.dark}aa}h1{font-size:clamp(3rem,8vw,7.2rem);line-height:.93;letter-spacing:-.065em;margin:.8rem 0 1.5rem;max-width:950px}h2{font-size:clamp(1.7rem,4vw,3rem);line-height:1.05;letter-spacing:-.035em}.lead{font-size:1.25rem;max-width:760px}.search{display:flex;background:white;padding:.45rem;border:1px solid ${s.dark}22;border-radius:1rem;box-shadow:0 18px 60px ${s.dark}18;margin:2rem 0}.search:focus-within{outline:3px solid ${s.accent};outline-offset:3px}.search input,.search select{flex:1;border:0;background:transparent;padding:1rem;font:inherit;min-width:0}.search button{border:0;border-radius:.7rem;background:${s.accent};padding:0 1.3rem;font-weight:850;color:${s.dark};cursor:pointer}.stat{border-top:3px solid ${s.accent};padding-top:1rem}.stat strong{display:block;font-size:clamp(2.3rem,5vw,4.5rem);line-height:1;letter-spacing:-.05em}.stat span{display:block;margin-top:.55rem}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:4rem}.card{background:#fffffff0;padding:1.5rem;border-radius:1.1rem;min-height:150px;border:1px solid ${s.dark}10;box-shadow:0 15px 45px ${s.dark}0b}.card small{display:block;text-transform:uppercase;letter-spacing:.1em;font-weight:800;margin-bottom:.7rem}.notice{margin:2rem 0;padding:1rem 1.2rem;border-left:5px solid ${s.accent};background:#fffffff0;border-radius:0 .8rem .8rem 0}.source{padding:1rem 0;border-bottom:1px solid ${s.dark}22}table{width:100%;border-collapse:collapse;background:white;margin:1rem 0 3rem}th,td{text-align:left;padding:.8rem;border-bottom:1px solid ${s.dark}22}th{background:${s.accent}33}footer{border-top:1px solid ${s.dark}22;font-size:.85rem}.report-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.3rem 1rem;align-items:center;margin:-2rem 0 2.5rem;padding:1rem 1.1rem;border:1px solid ${s.dark}22;border-radius:1rem;background:#fff;box-shadow:0 12px 36px ${s.dark}0f}.report-tools div{display:flex;flex-direction:column}.report-tools span,.report-tools small{color:${s.dark}aa;font-size:.83rem}.report-tools small{grid-column:2}.report-tools button{grid-column:2;grid-row:1;min-height:2.8rem;padding:.65rem 1rem;border:0;border-radius:.75rem;background:${s.accent};color:${s.dark};font:800 .92rem/1.2 Inter,ui-sans-serif,system-ui,sans-serif;cursor:pointer}.print-masthead{display:none}.crumbs{font-size:.88rem;color:${s.dark}aa;margin-bottom:2rem}.station-hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(18rem,.8fr);gap:2rem;align-items:stretch}.station-title{background:linear-gradient(145deg,${s.dark},#0d5068);color:white;border-radius:1.6rem;padding:clamp(1.5rem,4vw,3rem);position:relative;overflow:hidden}.station-title:after{content:'≈';position:absolute;right:-.3rem;bottom:-4rem;font-size:15rem;line-height:1;color:${s.accent};opacity:.12}.station-title h1{font-size:clamp(2.8rem,6vw,5.4rem);letter-spacing:-.055em;margin:.45rem 0}.station-title .lead{margin:.2rem 0 0;color:#d9f5ff}.pill{display:inline-flex;align-items:center;gap:.45rem;border-radius:99px;padding:.38rem .7rem;background:#d9f8e8;color:#075d38;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}.pill:before{content:'';width:.5rem;height:.5rem;border-radius:50%;background:#11a968}.reading-card{background:white;border-radius:1.6rem;padding:1.6rem;box-shadow:0 20px 60px ${s.dark}16;display:flex;flex-direction:column;justify-content:space-between}.reading-value{font-size:clamp(3rem,7vw,5rem);font-weight:850;letter-spacing:-.06em;line-height:1;margin:.5rem 0}.reading-value span{font-size:1rem;letter-spacing:0;color:${s.dark}99}.fresh{display:flex;align-items:center;gap:.5rem;color:${s.dark}aa;font-size:.9rem}.fresh:before{content:'●';color:#11a968}.actions{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.5rem 0 0}.button{display:inline-flex;align-items:center;justify-content:center;min-height:2.8rem;padding:.65rem 1rem;border-radius:.75rem;background:${s.accent};font-weight:800;text-decoration:none}.button.secondary{background:white;border:1px solid ${s.dark}33}.evidence-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.2rem 0 2.5rem}.evidence-card{background:white;border-radius:1.1rem;padding:1.25rem;border:1px solid ${s.dark}12}.evidence-card small{display:block;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem;font-weight:800;color:${s.dark}99}.evidence-card strong{display:block;font-size:1.2rem;margin:.35rem 0}.feature-band{margin:4rem 0;padding:clamp(1.5rem,4vw,3rem);border-radius:1.8rem;background:${s.dark};color:white;position:relative;overflow:hidden}.feature-band:after{content:'37X';position:absolute;right:1rem;bottom:-2.8rem;font-size:9rem;font-weight:900;color:${s.accent};opacity:.08}.feature-band h2{max-width:760px}.step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem}.step{padding:1.2rem;border-top:1px solid #ffffff55}.step strong{display:block;color:${s.accent};font-size:1.6rem}.browse{columns:3;list-style:none;padding:0}.browse li{break-inside:avoid;padding:.45rem 0}.browse a{font-weight:750}.visual-panel{display:grid;grid-template-columns:.8fr 1.2fr;gap:1.2rem;align-items:stretch;margin:2rem 0;padding:1.2rem;border:1px solid ${s.dark}18;border-radius:1.3rem;background:#fff}.visual-copy{padding:.4rem}.visual-copy h2{margin:.25rem 0 .7rem;font-size:1.8rem}.visual-coordinates{font-family:ui-monospace,SFMono-Regular,monospace;color:${s.dark}aa}.map-frame{min-height:320px;overflow:hidden;border-radius:1rem;background:${s.pale}}.map-frame iframe{display:block;width:100%;height:285px;border:0}.map-frame p{margin:.5rem .8rem;font-size:.76rem;color:${s.dark}aa}.chart-panel{display:grid;grid-template-columns:.7fr 1.3fr;gap:1.5rem;align-items:center;margin:2rem 0;padding:1.4rem;border:1px solid ${s.dark}18;border-radius:1.3rem;background:#fff}.chart-panel h2{margin:.25rem 0 .7rem;font-size:1.8rem}.chart-panel svg{width:100%;height:auto;overflow:visible}.chart-panel line{stroke:${s.dark}44;stroke-width:2}.chart-panel polyline{fill:none;stroke:${s.dark};stroke-width:5;stroke-linecap:round;stroke-linejoin:round}.chart-panel circle{fill:${s.accent};stroke:${s.dark};stroke-width:2}.chart-panel text{fill:${s.dark}aa;font-size:13px}.explain{display:grid;grid-template-columns:1.1fr .9fr;gap:1rem;margin:2rem 0}.panel{background:white;border-radius:1.2rem;padding:1.5rem}.panel h2{margin-top:0;font-size:1.55rem}.panel.warning{background:#fff8dc;border:1px solid #e5bf43}.technical{margin-top:2rem;border-top:1px solid ${s.dark}22;padding-top:1rem}.technical summary{cursor:pointer;font-weight:800;padding:.8rem 0}.technical-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0 2rem}.technical .source div{overflow-wrap:anywhere}.code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.88rem}@media(max-width:720px){header,footer{padding:1rem;align-items:flex-start}main{padding:2.3rem 1rem 4rem}.hero,.grid,.station-hero,.evidence-grid,.visual-panel,.chart-panel,.explain,.technical-grid,.step-grid{grid-template-columns:1fr;gap:1rem}h1{font-size:3.7rem}nav{gap:.7rem;font-size:.82rem}.search{flex-wrap:wrap}.search button{padding:.8rem;width:100%}.browse{columns:1}footer{flex-direction:column}table{font-size:.85rem}.station-title,.reading-card{border-radius:1.2rem}.reading-value{font-size:3.6rem}.actions .button{width:100%}.report-tools{grid-template-columns:1fr;margin:-.8rem 0 2rem}.report-tools button,.report-tools small{grid-column:1;grid-row:auto}.report-tools button{width:100%}}@media print{@page{size:A4;margin:14mm 13mm 16mm}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{background:#fff;color:#172b35;font:10.5pt/1.45 Georgia,serif}header,footer,.skip,.report-tools,.actions,.search{display:none!important}main{max-width:none;padding:0}.print-masthead{display:flex;justify-content:space-between;gap:8mm;margin:0 0 10mm;padding:0 0 4mm;border-bottom:2px solid ${s.accent};font:8.5pt/1.25 Inter,Arial,sans-serif;color:${s.dark}}.print-masthead span:last-child{max-width:85mm;overflow-wrap:anywhere;text-align:right}.crumbs{display:none}h1{font-size:26pt;line-height:1.02;letter-spacing:-.035em;margin:4mm 0 7mm}h2{font-size:16pt;break-after:avoid}.station-hero{grid-template-columns:1.2fr .8fr;gap:6mm}.station-title,.reading-card,.card,.evidence-card,.panel,.notice,.visual-panel,.chart-panel{box-shadow:none;break-inside:avoid}.station-title{border-radius:4mm;padding:8mm}.station-title h1{font-size:28pt}.reading-card{border:1px solid #ccd7dc;border-radius:4mm}.evidence-grid{grid-template-columns:repeat(3,1fr);gap:4mm}.visual-panel{grid-template-columns:.8fr 1.2fr}.map-frame{min-height:65mm}.map-frame iframe{height:58mm}.chart-panel{grid-template-columns:.7fr 1.3fr}.explain{grid-template-columns:1fr 1fr;gap:4mm}.source{break-inside:avoid;padding:3mm 0}.technical{display:block}.technical>summary{list-style:none}.technical>summary::-webkit-details-marker{display:none}.technical-grid{grid-template-columns:1fr 1fr}table{font-size:8.5pt;margin:4mm 0 8mm;break-inside:auto}thead{display:table-header-group}tr{break-inside:avoid}th,td{padding:2.2mm}.button{display:none!important}a{text-decoration:none;color:inherit}.notice{border:1px solid #ccd7dc;border-left:4px solid ${s.accent}}}`;
-}
-
-function polishCss(s) {
-  return `
-body{font-size:16px;line-height:1.6}
-header{position:sticky;top:0;z-index:50;background:${s.pale}e8;backdrop-filter:blur(16px);border-bottom:1px solid ${s.dark}12}
-.brand{letter-spacing:-.02em}.brand b{min-width:2.55rem;height:2.55rem;border-radius:999px;box-shadow:0 10px 30px ${s.dark}24}
-nav a{font-size:.86rem;padding:.35rem 0;border-bottom:2px solid transparent}nav a:hover{border-bottom-color:${s.accent}}
-main{padding-top:1.4rem}
-.proof-strip{display:flex;gap:.75rem 1.35rem;align-items:center;flex-wrap:wrap;margin:0 0 1.5rem;padding:.7rem 1rem;border-radius:.85rem;background:#ffffffbd;border:1px solid ${s.dark}10;color:${s.dark}b8;font-size:.76rem;font-weight:750;text-transform:uppercase;letter-spacing:.055em}
-.proof-strip span{display:flex;align-items:center;gap:.42rem}.proof-strip i{width:.46rem;height:.46rem;border-radius:50%;background:${s.accent};box-shadow:0 0 0 3px ${s.accent}2b}
-.hero{grid-template-columns:minmax(0,1.45fr) minmax(15rem,.55fr);gap:clamp(2rem,5vw,5rem);position:relative;overflow:hidden;padding:clamp(2rem,5vw,4.8rem);border-radius:2rem;background:linear-gradient(145deg,${s.dark},color-mix(in srgb,${s.dark} 82%,${s.accent}));color:white;box-shadow:0 28px 80px ${s.dark}2b}
-.hero:after{content:'';position:absolute;width:25rem;height:25rem;right:-10rem;top:-13rem;border:1px solid ${s.accent}6b;border-radius:50%;box-shadow:0 0 0 4rem ${s.accent}13,0 0 0 8rem ${s.accent}0b;pointer-events:none}.hero>*{position:relative;z-index:1}.hero .eyebrow{color:${s.accent}}.hero h1{color:#fff;font-size:clamp(2.8rem,6.8vw,6.4rem)}.hero .lead{color:#ffffffd8}
-.hero .search{margin-bottom:0;color:${s.dark}}.stat{padding:1.3rem;border:1px solid #ffffff38;border-radius:1.25rem;background:#ffffff12;backdrop-filter:blur(8px)}.stat strong{color:${s.accent}}.stat span{color:#ffffffe0}
-.card,.evidence-card{box-shadow:0 14px 40px ${s.dark}0c;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.card[href]:hover,a.card:hover{transform:translateY(-4px);box-shadow:0 22px 55px ${s.dark}18;border-color:${s.accent}8a}
-table{border-radius:1rem;overflow:hidden;box-shadow:0 12px 36px ${s.dark}0b}.report-tools{margin-top:0}
-@media(max-width:720px){header{position:static}main{padding-top:1rem}.hero{padding:1.5rem;border-radius:1.35rem}.proof-strip{margin-bottom:1rem}.hero h1{font-size:clamp(2.7rem,13vw,4rem)}}
-@media print{.proof-strip{display:none!important}}
-`;
 }
 
 function home(site, ready, origin, catalog) {
@@ -233,58 +214,49 @@ const entityId = (record) =>
   record?.organisation_number ??
   record?.ocid ??
   record?.id;
+function entityIndexable(site, entity) {
+  if (!entity) return false;
+  if (site.projection.includes("charitysignal")) {
+    const status = String(entity.charity_registration_status || "").toLowerCase();
+    return Boolean(
+      entity.charity_name &&
+        entity.registered_charity_number &&
+        entity.date_of_extract &&
+        !entity.date_of_removal &&
+        !status.includes("removed"),
+    );
+  }
+  if (site.projection.includes("australiancompanydata")) {
+    return Boolean(
+      entity.status === "REGD" &&
+        entity.abn &&
+        entity.registration_date &&
+        entity.current_name &&
+        entity.company_name &&
+        entity.current_name !== entity.company_name,
+    );
+  }
+  if (site.projection.includes("tendertendertender")) {
+    return Boolean(
+      entity.title &&
+        entity.buyer_organisation &&
+        entity.published_date &&
+        (entity.description || entity.tender_deadline || entity.value),
+    );
+  }
+  if (site.projection.includes("road-collisions"))
+    return Object.keys(entity.years || {}).length >= 2;
+  if (site.projection.includes("floodingfacts"))
+    return Boolean(entity.label && entity.riverName && entity.measures?.length);
+  if (site.projection.includes("tide-marine"))
+    return Boolean(entity.name && (entity.predictions?.length || entity.observations?.length));
+  return true;
+}
 const routeValue = (value) => encodeURIComponent(String(value ?? "").trim());
 const routeRecords = (records, field, value) =>
   records.filter(
     (record) => String(record?.[field] ?? "").trim() === String(value).trim(),
   );
-const recordPoint = (record) => {
-  const lat = Number(record?.lat ?? record?.latitude);
-  const lon = Number(record?.long ?? record?.lon ?? record?.longitude);
-  return Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
-};
-const straightLineKm = (left, right) => {
-  if (!left || !right) return null;
-  const radians = (value) => (value * Math.PI) / 180;
-  const dLat = radians(right.lat - left.lat);
-  const dLon = radians(right.lon - left.lon);
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(radians(left.lat)) * Math.cos(radians(right.lat)) * Math.sin(dLon / 2) ** 2;
-  return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-};
-function relatedEntitySection(site, entity, id, records = []) {
-  const current = recordPoint(entity);
-  const tide = site.projection.includes("tide-marine");
-  const flood = site.projection.includes("floodingfacts");
-  const river = entity.riverName || entity.river;
-  const groupValue = tide ? entity.state : flood ? river : entity.state || entity.admin_area || entity.country;
-  const ranked = records
-    .filter((record) => String(entityId(record)) !== String(id))
-    .map((record) => ({ ...record, distance: straightLineKm(current, recordPoint(record)) }))
-    .filter((record) => {
-      if (tide) return groupValue && record.state === groupValue;
-      if (flood) return (river && record.river === river) || (entity.catchmentName && record.catchment === entity.catchmentName);
-      return groupValue && [record.state, record.admin_area, record.country].includes(groupValue);
-    })
-    .sort((a, b) => (a.distance ?? Number.MAX_VALUE) - (b.distance ?? Number.MAX_VALUE))
-    .slice(0, 6);
-  if (!ranked.length) return "";
-  const cards = ranked.map((record) => {
-    const recordId = entityId(record);
-    const name = record.name || record.label || record.charity_name || record.company_name || record.title || recordId;
-    const context = tide
-      ? `${record.state || "US coast"}${record.distance != null ? ` · ${record.distance.toLocaleString("en-GB", { maximumFractionDigits: 0 })} km away` : ""}`
-      : flood
-        ? [record.river, record.town, record.distance != null ? `${record.distance.toLocaleString("en-GB", { maximumFractionDigits: 0 })} km away` : null].filter(Boolean).join(" · ")
-        : [record.admin_area, record.state, record.country].filter(Boolean).join(" · ");
-    return `<a class="card" href="/entity/${routeValue(recordId)}" style="text-decoration:none;min-height:0"><small>${esc(context || `Related ${site.entity} record`)}</small><h2 style="font-size:1.35rem">${esc(name)}</h2><p>Open the source-linked record →</p></a>`;
-  }).join("");
-  const groupLink = tide && groupValue
-    ? `<a href="/state/${routeValue(groupValue)}">All stations in ${esc(groupValue)} →</a>`
-    : flood && river
-      ? `<a href="/river/${routeValue(river)}">All stations on ${esc(river)} →</a>`
-      : "";
-  return `<section class="related-records" aria-labelledby="related-records-heading"><div class="section-heading"><div><p class="eyebrow">Keep exploring</p><h2 id="related-records-heading">${tide ? "Nearby tide stations" : flood ? `More monitoring on ${esc(river || "this watercourse")}` : `Similar ${esc(site.entity)} records`}</h2><p>These are linked by published geography or classification—not editorial ranking.</p></div>${groupLink}</div><div class="grid">${cards}</div>${current ? `<p class="fine-print">Distances are straight-line measurements between published station coordinates, not travel distances.</p>` : ""}</section>`;
-}
 function sitemapXml(origin, records = [], extraPaths = []) {
   const paths = ["/", "/about", "/sources", "/corrections", ...extraPaths];
   for (const record of records) {
@@ -622,7 +594,7 @@ function evidenceChart(entity) {
     .join(" ");
   return `<section class="chart-panel" aria-labelledby="chart-heading"><div><p class="eyebrow">Visual evidence</p><h2 id="chart-heading">${esc(heading)}</h2><p>The chart visualises the values listed in the table below; it does not interpolate missing records.</p></div><svg viewBox="0 0 600 205" role="img" aria-label="${esc(heading)}, ranging from ${min} to ${max}"><line x1="20" y1="170" x2="580" y2="170"></line><polyline points="${coords}"></polyline>${points.map((row, index) => `<circle cx="${((index / (points.length - 1)) * 560 + 20).toFixed(1)}" cy="${(170 - ((row.value - min) / range) * 130).toFixed(1)}" r="4"><title>${esc(row.label)}: ${esc(row.value)}</title></circle>`).join("")}<text x="20" y="198">${esc(points[0].label)}</text><text x="580" y="198" text-anchor="end">${esc(points.at(-1).label)}</text></svg></section>`;
 }
-function floodEntityPage(site, entity, origin, id, related = "") {
+function floodEntityPage(site, entity, origin, id) {
   const reading = entity.measures?.[0];
   const measure = String(reading?.measure_id || "");
   const unit = measure.includes("mASD")
@@ -676,7 +648,7 @@ function floodEntityPage(site, entity, origin, id, related = "") {
     <div class="actions"><a class="button" href="${warningUrl}" rel="external">Check official flood warnings ↗</a>${mapUrl ? `<a class="button secondary" href="${mapUrl}" rel="external">View station map ↗</a>` : ""}<a class="button secondary" href="/search?q=${encodeURIComponent(entity.town || place)}">Find another station</a></div>
     <section class="evidence-grid" aria-label="Station summary"><article class="evidence-card"><small>River</small><strong>${esc(river)}</strong><span>Watercourse named by the publisher</span></article><article class="evidence-card"><small>Catchment</small><strong>${esc(entity.catchmentName || "Unavailable")}</strong><span>Environment Agency catchment context</span></article><article class="evidence-card"><small>Station ID</small><strong>${esc(entity.stationReference || id)}</strong><span>Use this when checking the official source</span></article></section>
     ${locatorMap(entity, place)}
-    <section class="explain"><article class="panel"><h2>What this reading tells you</h2><p>It is the latest value published for this monitoring instrument at the stated observation time. The unit <strong>${esc(unit)}</strong> is retained from the Environment Agency measure record.</p><p>This page does not currently have an approved typical range or warning threshold for this measure, so it does not label the reading as high, normal or low.</p></article><article class="panel warning"><h2>Need a current safety answer?</h2><p>A gauge reading is not a flood warning or a property-risk assessment. Use the official warning service for current alerts and follow emergency-service advice.</p><p><a href="${warningUrl}" rel="external"><strong>Open the official flood-warning check →</strong></a></p></article></section>${related}
+    <section class="explain"><article class="panel"><h2>What this reading tells you</h2><p>It is the latest value published for this monitoring instrument at the stated observation time. The unit <strong>${esc(unit)}</strong> is retained from the Environment Agency measure record.</p><p>This page does not currently have an approved typical range or warning threshold for this measure, so it does not label the reading as high, normal or low.</p></article><article class="panel warning"><h2>Need a current safety answer?</h2><p>A gauge reading is not a flood warning or a property-risk assessment. Use the official warning service for current alerts and follow emergency-service advice.</p><p><a href="${warningUrl}" rel="external"><strong>Open the official flood-warning check →</strong></a></p></article></section>
     <details class="technical"><summary>Technical record and provenance</summary><div class="technical-grid">${technical}</div><p><a href="/sources">Source, licence and methodology</a></p></details>`,
     {
       title: `${place} river level and station reading | FloodingFacts`,
@@ -686,7 +658,7 @@ function floodEntityPage(site, entity, origin, id, related = "") {
     },
   );
 }
-function tideEntityPage(site, entity, origin, id, related = "") {
+function tideEntityPage(site, entity, origin, id) {
   const title = entity.name || id;
   const predictions = [...(entity.predictions || [])].sort((a, b) =>
     String(a.prediction_time).localeCompare(String(b.prediction_time)),
@@ -714,7 +686,7 @@ function tideEntityPage(site, entity, origin, id, related = "") {
   <section class="evidence-grid"><article class="evidence-card"><small>Datum</small><strong>${esc(datum)}</strong><span>The vertical reference for the published height</span></article><article class="evidence-card"><small>Time basis</small><strong>${esc(zone)}</strong><span>Retained from the NOAA response</span></article><article class="evidence-card"><small>Coverage</small><strong>${predictions.length} predictions</strong><span>${observations.length} recent observations stored</span></article></section>
   ${locatorMap(entity, title)}${evidenceChart(entity)}
   <section id="next-tides"><p class="eyebrow">Plan the next water window</p><h2>Next published high and low tides</h2>${rows ? `<table><thead><tr><th>Published time</th><th>Event</th><th>Height</th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="notice">No prediction series is available for this station.</div>`}</section>
-  <section class="explain"><article class="panel"><h2>How to read this page</h2><p>Predicted heights are astronomical estimates relative to <strong>${esc(datum)}</strong>. Weather, pressure, wind and river flow can move observed water away from the prediction.</p></article><article class="panel warning"><h2>For navigation or safety</h2><p>This is a planning aid, not a navigational chart or warning service. Check NOAA notices, local conditions and official marine guidance before acting.</p></article></section>${related}
+  <section class="explain"><article class="panel"><h2>How to read this page</h2><p>Predicted heights are astronomical estimates relative to <strong>${esc(datum)}</strong>. Weather, pressure, wind and river flow can move observed water away from the prediction.</p></article><article class="panel warning"><h2>For navigation or safety</h2><p>This is a planning aid, not a navigational chart or warning service. Check NOAA notices, local conditions and official marine guidance before acting.</p></article></section>
   <details class="technical"><summary>Source, identifiers and limitations</summary><div class="technical-grid"><div class="source"><strong>Station ID</strong><div>${esc(id)}</div></div><div class="source"><strong>Source</strong><div>NOAA CO-OPS Data API</div></div><div class="source"><strong>Prediction datum</strong><div>${esc(datum)}</div></div><div class="source"><strong>Time basis</strong><div>${esc(zone)}</div></div></div><p><a href="/sources">Read the full source and methodology record</a></p></details>`,
     {
       title: `${title} tide times and water levels | Tide & Marine Conditions`,
@@ -816,14 +788,13 @@ async function charitySearch(env, site, origin, query) {
     },
   );
 }
-function entityPage(site, entity, origin, id, records = []) {
-  const related = relatedEntitySection(site, entity, id, records);
+function entityPage(site, entity, origin, id) {
   if (site.projection.includes("tide-marine"))
-    return tideEntityPage(site, entity, origin, id, related);
+    return tideEntityPage(site, entity, origin, id);
   if (site.projection.includes("charitysignal"))
     return charityEntityPage(site, entity, origin, id);
   if (site.projection.includes("floodingfacts"))
-    return floodEntityPage(site, entity, origin, id, related);
+    return floodEntityPage(site, entity, origin, id);
   const hidden = new Set([
     "predictions",
     "observations",
@@ -833,7 +804,7 @@ function entityPage(site, entity, origin, id, records = []) {
   ]);
   const facts = Object.entries(entity)
     .filter(
-      ([k, v]) => !hidden.has(k) && v !== null && v !== undefined && v !== "",
+      ([k, v]) => !hidden.has(k) && !k.startsWith("_") && v !== null && v !== undefined && v !== "",
     )
     .map(
       ([k, v]) =>
@@ -888,7 +859,7 @@ function entityPage(site, entity, origin, id, records = []) {
     id;
   return shell(
     site,
-    `<p class="eyebrow">Official ${esc(site.entity)} evidence</p><h1>${esc(title)}</h1><div class="notice">Source fields are shown as published in the approved projection. Unknown and unavailable values are not inferred.</div>${locatorMap(entity, title)}${evidenceChart(entity)}${facts}${tables}${related}<p><a href="/sources">Source, licence and methodology</a></p>`,
+    `<p class="eyebrow">Official ${esc(site.entity)} evidence</p><h1>${esc(title)}</h1><div class="notice">Source fields are shown as published in the approved projection. Unknown and unavailable values are not inferred.${entity._projectionGeneratedAt ? ` Projection generated ${esc(prettyTime(entity._projectionGeneratedAt))}.` : ""}</div>${locatorMap(entity, title)}${evidenceChart(entity)}${facts}${tables}<p><a href="/sources">Source, licence and methodology</a></p>`,
     {
       title: `${title} · ${site.name}`,
       description: `Official ${site.entity} evidence for ${title}, with source and currentness.`,
@@ -898,7 +869,7 @@ function entityPage(site, entity, origin, id, records = []) {
   );
 }
 
-export { entityPage };
+export { entityIndexable, entityPage };
 async function getEntity(env, site, id) {
   if (site.projection.includes("tide-marine")) {
     const o = await env.PUBLIC_DATA.get(
@@ -993,6 +964,15 @@ export default {
       origin = url.origin,
       preview = url.hostname.endsWith(".workers.dev");
     if (
+      site.canonicalHost &&
+      url.hostname === `www.${site.canonicalHost}`
+    ) {
+      return Response.redirect(
+        `https://${site.canonicalHost}${url.pathname}${url.search}`,
+        301,
+      );
+    }
+    if (
       url.pathname === "/api/notices" &&
       (site.projection.includes("tendertendertender") ||
         site.projection.includes("ukpublicmoney"))
@@ -1079,13 +1059,20 @@ export default {
           .filter(([, count]) => count >= 2)
           .map(([river]) => `/river/${routeValue(river)}`);
       }
-      return new Response(sitemapXml(origin, records, extraPaths), {
+      return new Response(
+        sitemapXml(
+          origin,
+          records.filter((record) => entityIndexable(site, record)),
+          extraPaths,
+        ),
+        {
         headers: {
           "content-type": "application/xml; charset=utf-8",
           "cache-control": "public, max-age=900",
           "x-content-type-options": "nosniff",
         },
-      });
+      },
+      );
     }
     const sitemapShard = url.pathname.match(
       /^\/sitemaps\/(pages|[0-9a-f]{2})\.xml$/,
@@ -1116,13 +1103,19 @@ export default {
           status: 404,
           headers: { "content-type": "text/plain", "x-robots-tag": "noindex" },
         });
-      return new Response(sitemapXml(origin, records), {
+      return new Response(
+        sitemapXml(
+          origin,
+          records.filter((record) => entityIndexable(site, record)),
+        ),
+        {
         headers: {
           "content-type": "application/xml; charset=utf-8",
           "cache-control": "public, max-age=86400",
           "x-content-type-options": "nosniff",
         },
-      });
+      },
+      );
     }
     if (
       url.pathname === "/" &&
@@ -1395,11 +1388,16 @@ export default {
           404,
           { "x-robots-tag": "noindex" },
         );
-      return response(
-        entityPage(site, entity, origin, id, state.data?.entities || []),
-        200,
-        previewHeaders,
-      );
+      Object.defineProperty(entity, "_projectionGeneratedAt", {
+        value: state.data?.generatedAt || null,
+        enumerable: false,
+      });
+      return response(entityPage(site, entity, origin, id), 200, {
+        ...previewHeaders,
+        ...(entityIndexable(site, entity)
+          ? {}
+          : { "x-robots-tag": "noindex, follow" }),
+      });
     }
     return response(
       shell(
